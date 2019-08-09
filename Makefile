@@ -1,21 +1,28 @@
-CC = x86_64-w64-mingw32-gcc
-CFLAGS = -m32 -shared -nostdlib -mno-red-zone -fno-stack-protector -Wall \
-         -e EfiMain -g -I. -I./edk/Foundation/Efi/Include \
-         -I./edk/Foundation/Include -I./edk/Foundation/Efi \
-	 -I./edk/Foundation/Framework/Include
+TRIPLE=x86_64-pc-win32-ocff
+CC=clang
+CFLAGS=--target=$(TRIPLE) -Wall -Werror \
+	   -mno-red-zone -fno-stack-protector -fshort-wchar \
+	   -Iinclude/edk2/MdePkg/Include \
+	   -Iinclude/edk2/MdePkg/Include/X64
+AS=llvm-mc
+ASFLAGS=triple=$(TRIPLE) -filetype=obj
+LD=lld-link
+LDFLAGS=-subsystem:efi_application -nodefaultlib
 
-all: main.efi
+SRCS=$(wildcard *.c)
+ASMS=$(wildcard *.s)
+OBJS=$(SRCS:.c=.o) $(ASMS:.s=.o)
+TARGET=main.efi
 
-%.efi: %.dll
-	objcopy --target=efi-app-i386 $< $@
+all: $(TARGET)
 
-%.dll: %.c
-	$(CC) $(CFLAGS) $< -o $@
+$(TARGET): $(OBJS)
+	$(LD) $(LDFLAGS) -entry:EfiMain $^ -out:$@
 
-qemu: main.efi OVMF.fd image/EFI/BOOT/BOOTX64.EFI
+qemu: $(TARGET) OVMF.fd image/EFI/BOOT/BOOTX64.EFI
 	qemu-system-x86_64 -nographic -bios OVMF.fd -hda fat:image
 
-image/EFI/BOOT/BOOTX64.EFI:
+image/EFI/BOOT/BOOTX64.EFI: $(TARGET)
 	mkdir -p image/EFI/BOOT
 	ln -sf ../../../main.efi image/EFI/BOOT/BOOTX64.EFI
 
@@ -25,5 +32,5 @@ OVMF.fd:
 	rm OVMF-X64-r15214.zip
 
 clean:
-	rm -f main.efi OVMF.fd
+	rm -f $(TARGET) OVMF.fd
 	rm -rf image
