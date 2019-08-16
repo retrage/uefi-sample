@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-3-Clause
+
 TRIPLE=x86_64-pc-win32-ocff
 CC=clang
 CFLAGS=--target=$(TRIPLE) -Wall -Werror \
