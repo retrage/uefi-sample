@@ -1,2 +1,4 @@
 *.o
 *.efi
+OVMF.fd
+image
