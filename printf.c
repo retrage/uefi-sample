@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
 /*
  * The Minimal snprintf() implementation
  *
@@ -41,7 +42,7 @@
  *
  */
 
-#include "mini-printf.h"
+#include "printf.h"
 
 static unsigned int
 mini_strlen(const char *s)
@@ -127,7 +128,7 @@ _puts(char *s, unsigned int len, struct mini_buff *b)
 }
 
 int
-mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list va)
+mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin_va_list va)
 {
 	struct mini_buff b;
 	char bf[24];
@@ -165,22 +166,22 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 
 				case 'u':
 				case 'd':
-					len = mini_itoa(va_arg(va, unsigned int), 10, 0, (ch=='u'), bf, zero_pad);
+					len = mini_itoa(__builtin_va_arg(va, unsigned int), 10, 0, (ch=='u'), bf, zero_pad);
 					_puts(bf, len, &b);
 					break;
 
 				case 'x':
 				case 'X':
-					len = mini_itoa(va_arg(va, unsigned int), 16, (ch=='X'), 1, bf, zero_pad);
+					len = mini_itoa(__builtin_va_arg(va, unsigned int), 16, (ch=='X'), 1, bf, zero_pad);
 					_puts(bf, len, &b);
 					break;
 
 				case 'c' :
-					_putc((char)(va_arg(va, int)), &b);
+					_putc((char)(__builtin_va_arg(va, int)), &b);
 					break;
 
 				case 's' :
-					ptr = va_arg(va, char*);
+					ptr = __builtin_va_arg(va, char*);
 					_puts(ptr, mini_strlen(ptr), &b);
 					break;
 
@@ -199,10 +200,10 @@ int
 mini_snprintf(char* buffer, unsigned int buffer_len, const char *fmt, ...)
 {
 	int ret;
-	va_list va;
-	va_start(va, fmt);
+	__builtin_va_list va;
+    __builtin_va_start(va, fmt);
 	ret = mini_vsnprintf(buffer, buffer_len, fmt, va);
-	va_end(va);
+	__builtin_va_end(va);
 
 	return ret;
 }

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
 /*
  * The Minimal snprintf() implementation
  *
@@ -35,9 +36,7 @@
 extern "C" {
 #endif
 
-#include <stdarg.h>
-
-int mini_vsnprintf(char* buffer, unsigned int buffer_len, const char *fmt, va_list va);
+int mini_vsnprintf(char* buffer, unsigned int buffer_len, const char *fmt, __builtin_va_list va);
 int mini_snprintf(char* buffer, unsigned int buffer_len, const char *fmt, ...);
 
 #ifdef __cplusplus
