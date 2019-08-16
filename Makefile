@@ -5,7 +5,8 @@ CC=clang
 CFLAGS=--target=$(TRIPLE) -Wall -Werror \
 	   -mno-red-zone -fno-stack-protector -fshort-wchar \
 	   -Iinclude/edk2/MdePkg/Include \
-	   -Iinclude/edk2/MdePkg/Include/X64
+	   -Iinclude/edk2/MdePkg/Include/X64 \
+	   -Iinclude
 AS=llvm-mc
 ASFLAGS=triple=$(TRIPLE) -filetype=obj
 LD=lld-link
@@ -34,9 +35,12 @@ $(APP): $(TARGET)
 	cp $(TARGET) $(APP)
 
 qemu: $(APP) $(ROM)
-	qemu-system-x86_64 -bios $(ROM) -drive file=fat:rw:$(IMG)
+	qemu-system-x86_64 -bios $(ROM) -drive file=fat:rw:$(IMG) -nographic
 
 clean:
-	rm -rf $(TARGET) $(OBJS) $(ROM) $(IMG)
+	rm -rf $(TARGET) $(OBJS) $(IMG)
 
-.PHONY: all clean qemu
+clean-all: clean
+	rm -rf $(ROM)
+
+.PHONY: all clean clean-all qemu
