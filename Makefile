@@ -14,23 +14,27 @@ ASMS=$(wildcard *.s)
 OBJS=$(SRCS:.c=.o) $(ASMS:.s=.o)
 TARGET=main.efi
 
+URL=https://github.com/retrage/edk2-nightly/raw/master/bin/RELEASEX64_OVMF.fd
+ROM=OVMF.fd
+APP=image/EFI/BOOT/BOOTX64.EFI
+IMG=$(firstword $(subst /, ,$(dir $(APP))))
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -entry:EfiMain $^ -out:$@
 
-qemu: $(TARGET) OVMF.fd image/EFI/BOOT/BOOTX64.EFI
-	qemu-system-x86_64 -nographic -bios OVMF.fd -hda fat:image
+$(ROM):
+	wget -q -O $(ROM) $(URL)
 
-image/EFI/BOOT/BOOTX64.EFI: $(TARGET)
-	mkdir -p image/EFI/BOOT
-	ln -sf ../../../main.efi image/EFI/BOOT/BOOTX64.EFI
+$(APP): $(TARGET)
+	mkdir -p $(dir $(APP))
+	cp $(TARGET) $(APP)
 
-OVMF.fd:
-	wget http://downloads.sourceforge.net/project/edk2/OVMF/OVMF-X64-r15214.zip
-	unzip OVMF-X64-r15214.zip OVMF.fd
-	rm OVMF-X64-r15214.zip
+qemu: $(APP) $(ROM)
+	qemu-system-x86_64 -bios $(ROM) -drive file=fat:rw:$(IMG)
 
 clean:
-	rm -f $(TARGET) OVMF.fd
-	rm -rf image
+	rm -rf $(TARGET) $(OBJS) $(ROM) $(IMG)
+
+.PHONY: all clean qemu
