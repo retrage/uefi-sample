@@ -8,7 +8,7 @@ CFLAGS=--target=$(TRIPLE) -Wall -Werror \
 	   -Iinclude/edk2/MdePkg/Include/X64 \
 	   -Iinclude
 AS=llvm-mc
-ASFLAGS=triple=$(TRIPLE) -filetype=obj
+ASFLAGS=-triple=$(TRIPLE) -filetype=obj
 LD=lld-link
 LDFLAGS=-subsystem:efi_application -nodefaultlib
 
