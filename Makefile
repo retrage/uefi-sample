@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
-TRIPLE=x86_64-pc-win32-ocff
+TRIPLE=x86_64-pc-win32-coff
 CC=clang
 CFLAGS=--target=$(TRIPLE) -Wall -Werror \
 	   -mno-red-zone -fno-stack-protector -fshort-wchar \
