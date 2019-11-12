@@ -3,8 +3,6 @@
 #include <Uefi.h>
 #include <GlobalTable.h>
 
-int main(void);
-
 EFI_STATUS
 EFIAPI
 EfiMain (
@@ -16,10 +14,5 @@ EfiMain (
   gST = SystemTable;
   gBS = gST->BootServices;
 
-  return main();
-}
-
-int main()
-{
   return EFI_SUCCESS;
 }
