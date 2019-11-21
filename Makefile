@@ -17,30 +17,48 @@ ASMS=$(wildcard *.s)
 OBJS=$(SRCS:.c=.o) $(ASMS:.s=.o)
 TARGET=main.efi
 
-URL=https://github.com/retrage/edk2-nightly/raw/master/bin/RELEASEX64_OVMF.fd
-ROM=OVMF.fd
-APP=image/EFI/BOOT/BOOTX64.EFI
-IMG=$(firstword $(subst /, ,$(dir $(APP))))
+IMG=image
+APP=$(IMG)/$(TARGET)
+STARTUP=$(IMG)/startup.nsh
+
+URLBASE=https://github.com/retrage/edk2-nightly/raw/master/bin
+OVMFCODE=RELEASEX64_OVMF_CODE.fd
+OVMFVARS=RELEASEX64_OVMF_VARS.fd
+
+QEMU=qemu-system-x86_64
+QEMUFLAGS=-drive format=raw,file=fat:rw:$(IMG) \
+		  -drive if=pflash,format=raw,readonly,file=$(OVMFCODE) \
+		  -drive if=pflash,format=raw,file=$(OVMFVARS) \
+		  -nodefaults \
+		  -nographic \
+		  -serial stdio
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -entry:EfiMain $^ -out:$@
 
-$(ROM):
-	wget -q -O $(ROM) $(URL)
+$(OVMFCODE):
+	wget -q -O $@ $(URLBASE)/$@
+
+$(OVMFVARS):
+	wget -q -O $@ $(URLBASE)/$@
 
 $(APP): $(TARGET)
-	mkdir -p $(dir $(APP))
-	cp $(TARGET) $(APP)
+	mkdir -p $(dir $@)
+	cp $(TARGET) $@
 
-qemu: $(APP) $(ROM)
-	qemu-system-x86_64 -bios $(ROM) -drive file=fat:rw:$(IMG) -nographic
+$(STARTUP): $(APP)
+	echo "fs0:" > $@
+	echo "$(TARGET)" > $@
+
+run: $(APP) $(STARTUP) $(OVMFCODE) $(OVMFVARS)
+	$(QEMU) $(QEMUFLAGS)
 
 clean:
 	rm -rf $(TARGET) $(OBJS) $(IMG)
 
 clean-all: clean
-	rm -rf $(ROM)
+	rm -rf $(OVMFCODE) $(OVMFVARS)
 
-.PHONY: all clean clean-all qemu
+.PHONY: all run clean clean-all
