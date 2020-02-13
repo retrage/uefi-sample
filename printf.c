@@ -101,6 +101,16 @@ struct mini_buff {
 	unsigned int buffer_len;
 };
 
+struct mini_guid {
+	unsigned long data1;
+	unsigned short data2;
+	unsigned short data3;
+	unsigned char data4[8];
+};
+
+const char *lguid_fmt = "%08x-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x";
+const char *uguid_fmt = "%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X";
+
 static int
 _putc(int ch, struct mini_buff *b)
 {
@@ -131,7 +141,7 @@ int
 mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin_va_list va)
 {
 	struct mini_buff b;
-	char bf[24];
+	char bf[48];
 	char ch;
 
 	b.buffer = buffer;
@@ -147,6 +157,7 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin
 			char zero_pad = 0;
 			char *ptr;
 			unsigned short *wptr;
+			struct mini_guid *g;
 			unsigned int len;
 
 			ch=*(fmt++);
@@ -190,6 +201,17 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin
 					wptr = __builtin_va_arg(va, unsigned short *);
                     while (*wptr != L'\0')
 						_putc((char)*(wptr++), &b);
+					break;
+
+				case 'g' :
+				case 'G' :
+					g = __builtin_va_arg(va, struct mini_guid*);
+					len = mini_snprintf(bf, 48,
+						(ch=='G') ? uguid_fmt : lguid_fmt,
+						g->data1, g->data2, g->data3,
+						g->data4[0], g->data4[1], g->data4[2], g->data4[3],
+						g->data4[4], g->data4[5], g->data4[6], g->data4[7]);
+					_puts(bf, len, &b);
 					break;
 
 				default:
