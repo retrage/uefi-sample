@@ -146,6 +146,7 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin
 		else {
 			char zero_pad = 0;
 			char *ptr;
+			unsigned short *wptr;
 			unsigned int len;
 
 			ch=*(fmt++);
@@ -183,6 +184,12 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin
 				case 's' :
 					ptr = __builtin_va_arg(va, char*);
 					_puts(ptr, mini_strlen(ptr), &b);
+					break;
+
+                case 'S' :
+					wptr = __builtin_va_arg(va, unsigned short *);
+                    while (*wptr != L'\0')
+						_putc((char)*(wptr++), &b);
 					break;
 
 				default:
