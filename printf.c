@@ -111,6 +111,74 @@ struct mini_guid {
 const char *lguid_fmt = "%08x-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x";
 const char *uguid_fmt = "%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X";
 
+struct mini_efi_status_type {
+	unsigned long long status;
+	char *string;
+};
+
+/* FIXME: support 32-bit */
+const struct mini_efi_status_type mini_efi_status[] = {
+	{ 0x0ULL               , "EFI_SUCCESS"               },
+	{ 0x8000000000000001ULL, "EFI_LOAD_ERROR"            },
+	{ 0x8000000000000002ULL, "EFI_INVALID_PARAMETER"     },
+	{ 0x8000000000000003ULL, "EFI_UNSUPPORTED"           },
+	{ 0x8000000000000004ULL, "EFI_BAD_BUFFER_SIZE"       },
+	{ 0x8000000000000005ULL, "EFI_BUFFER_TOO_SMALL"      },
+	{ 0x8000000000000006ULL, "EFI_NOT_READY"             },
+	{ 0x8000000000000007ULL, "EFI_DEVICE_ERROR"          },
+	{ 0x8000000000000008ULL, "EFI_WRITE_PROTECTED"       },
+	{ 0x8000000000000009ULL, "EFI_OUT_OF_RESOURCES"      },
+	{ 0x800000000000000aULL, "EFI_VOLUME_CORRUPTED"      },
+	{ 0x800000000000000bULL, "EFI_VOLUME_FULL"           },
+	{ 0x800000000000000cULL, "EFI_NO_MEDIA"              },
+	{ 0x800000000000000dULL, "EFI_MEDIA_CHANGED"         },
+	{ 0x800000000000000eULL, "EFI_NOT_FOUND"             },
+	{ 0x800000000000000fULL, "EFI_ACCESS_DENIED"         },
+	{ 0x8000000000000010ULL, "EFI_NO_RESPONSE"           },
+	{ 0x8000000000000011ULL, "EFI_NO_MAPPING"            },
+	{ 0x8000000000000012ULL, "EFI_TIMEOUT"               },
+	{ 0x8000000000000013ULL, "EFI_NOT_STARTED"           },
+	{ 0x8000000000000014ULL, "EFI_ALREADY_STARTED"       },
+	{ 0x8000000000000015ULL, "EFI_ABORTED"               },
+	{ 0x8000000000000016ULL, "EFI_ICMP_ERROR"            },
+	{ 0x8000000000000017ULL, "EFI_TFTP_ERROR"            },
+	{ 0x8000000000000018ULL, "EFI_PROTOCOL_ERROR"        },
+	{ 0x8000000000000019ULL, "EFI_INCOMPATIBLE_VERSION"  },
+	{ 0x800000000000001aULL, "EFI_SECURITY_VIOLATION"    },
+	{ 0x800000000000001bULL, "EFI_CRC_ERROR"             },
+	{ 0x800000000000001cULL, "EFI_END_OF_MEDIA"          },
+	{ 0x800000000000001fULL, "EFI_END_OF_FILE"           },
+	{ 0x8000000000000020ULL, "EFI_INVALID_LANGUAGE"      },
+	{ 0x8000000000000021ULL, "EFI_COMPROMISED_DATA"      },
+	{ 0x8000000000000023ULL, "EFI_HTTP_ERROR"            },
+	{ 0x8000000000000064ULL, "EFI_NETWORK_UNREACHABLE"   },
+	{ 0x8000000000000065ULL, "EFI_HOST_UNREACHABLE"      },
+	{ 0x8000000000000066ULL, "EFI_PROTOCOL_UNREACHABLE"  },
+	{ 0x8000000000000067ULL, "EFI_PORT_UNREACHABLE"      },
+	{ 0x8000000000000068ULL, "EFI_CONNECTION_FIN"        },
+	{ 0x8000000000000069ULL, "EFI_CONNECTION_RESET"      },
+	{ 0x800000000000006aULL, "EFI_CONNECTION_REFUSED"    },
+	{ 0x1ULL               , "EFI_WARN_UNKNOWN_GLYPH"    },
+	{ 0x2ULL               , "EFI_WARN_DELETE_FAILURE"   },
+	{ 0x3ULL               , "EFI_WARN_WRITE_FAILURE"    },
+	{ 0x4ULL               , "EFI_WARN_BUFFER_TOO_SMALL" },
+	{ 0x5ULL               , "EFI_WARN_STALE_DATA"       },
+	{ 0x6ULL               , "EFI_WARN_FILE_SYSTEM"      },
+};
+
+static char *
+_efi_status_str(unsigned long long status)
+{
+	unsigned int i;
+	unsigned int len;
+	len = sizeof(mini_efi_status) / sizeof(mini_efi_status[0]);
+	for (i = 0; i < len; i++) {
+		if (mini_efi_status[i].status == status)
+			return mini_efi_status[i].string;
+	}
+	return "";
+}
+
 static int
 _putc(int ch, struct mini_buff *b)
 {
@@ -212,6 +280,11 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, __builtin
 						g->data4[0], g->data4[1], g->data4[2], g->data4[3],
 						g->data4[4], g->data4[5], g->data4[6], g->data4[7]);
 					_puts(bf, len, &b);
+					break;
+
+				case 'r' :
+					ptr = _efi_status_str(__builtin_va_arg(va, unsigned long long));
+					_puts(ptr, mini_strlen(ptr), &b);
 					break;
 
 				default:
