@@ -108,8 +108,8 @@ struct mini_guid {
 	unsigned char data4[8];
 };
 
-const char *lguid_fmt = "%08x-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x";
-const char *uguid_fmt = "%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X";
+const char *lguid_fmt = "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x";
+const char *uguid_fmt = "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X";
 
 struct mini_efi_status_type {
 	unsigned long long status;
