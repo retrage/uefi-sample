@@ -6,20 +6,16 @@
 #include <GlobalTable.h>
 
 #include "printf.h"
+#include "string.h"
 
-const unsigned int BUFSIZE = 1024;
-
-unsigned int strnlen(const char *s, unsigned int maxlen)
+CHAR16
+GetChar (
+  VOID
+  )
 {
-  const char *a = s;
-  for (; *s && (s - a <= maxlen); s++);
-  return s - a;
-}
-
-char getchar()
-{
-  if (!gST)
-    return '\0';
+  if (gST == NULL) {
+    return L'\0';
+  }
 
   EFI_STATUS status;
   EFI_INPUT_KEY key;
@@ -28,47 +24,64 @@ char getchar()
     status = gST->ConIn->ReadKeyStroke(gST->ConIn, &key);
   } while (status == EFI_NOT_READY);
 
-  return (char)(key.UnicodeChar & 0x00ff);
+  return key.UnicodeChar;
 }
 
-void puts(const char *s)
+VOID
+AsciiPuts (
+  IN CONST CHAR8  *AsciiString
+  )
 {
-  if (!gST)
+  UINTN   Length;
+  UINTN   Index;
+  CHAR16  String[STR_MAX_LEN];
+
+  if (gST == NULL) {
     return;
+  }
 
-  unsigned int len = strnlen(s, BUFSIZE);
+  Length = AsciiStrnLen (AsciiString, STR_MAX_LEN);
 
-  CHAR16 ws[BUFSIZE];
-  for (int i = 0; i < len; i++)
-    ws[i] = (CHAR16)*s++;
-  ws[len] = L'\0';
+  for (Index = 0; Index < Length; Index++) {
+    String[Index] = (CHAR16)*AsciiString++;
+  }
+  String[Length] = L'\0'; 
 
-  gST->ConOut->OutputString(gST->ConOut, ws);
+  gST->ConOut->OutputString(gST->ConOut, String);
 }
 
-int printf(const char *fmt, ...)
+INTN
+AsciiPrint (
+  IN CONST CHAR8  *AsciiFormat,
+  ...
+  )
 {
-  int ret;
-  char buf[BUFSIZE];
-  __builtin_va_list va;
+  __builtin_va_list VA;
+  CHAR8             AsciiString[STR_MAX_LEN];
+  INTN              Ret;
 
-  __builtin_va_start(va, fmt);
-  ret = vsnprintf(buf, BUFSIZE, fmt, va);
-  __builtin_va_end(va);
+  __builtin_va_start(VA, AsciiFormat);
+  Ret = vsnprintf(AsciiString, STR_MAX_LEN, AsciiFormat, VA);
+  __builtin_va_end(VA);
 
-  puts(buf);
+  AsciiPuts (AsciiString);
 
-  return ret;
+  return Ret;
 }
 
-int sprintf(char *str, const char *fmt, ...)
+INTN
+AsciiSPrint (
+  OUT CHAR8       *AsciiString,
+  IN CONST CHAR8  *AsciiFormat,
+  ...
+  )
 {
-  int ret;
-  __builtin_va_list va;
+  __builtin_va_list VA;
+  INTN              Ret;
 
-  __builtin_va_start(va, fmt);
-  ret = vsnprintf(str, BUFSIZE, fmt, va);
-  __builtin_va_end(va);
+  __builtin_va_start(VA, AsciiFormat);
+  Ret = vsnprintf(AsciiString, STR_MAX_LEN, AsciiFormat, VA);
+  __builtin_va_end(VA);
 
-  return ret;
+  return Ret;
 }
