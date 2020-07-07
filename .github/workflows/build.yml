@@ -1,19 +1,19 @@
 name: Build
-on: [push]
+on: push
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup
-        run: |
-          apt update
-          apt install llvm-9 clang-9 lld-9 make
-          ln -sf /usr/bin/clang-9 /usr/local/bin/clang
-          ln -sf /usr/bin/lld-link-9 /usr/local/bin/lld-link
-          ln -sf /usr/bin/llvm-mc-9 /usr/local/bin/llvm-mc
-      - name: Build
-        run: |
-          make
+    - uses: actions/checkout@v2
+    - name: Setup
+      run: |
+        apt update
+        apt install llvm-9 clang-9 lld-9 make
+        ln -sf /usr/bin/clang-9 /usr/local/bin/clang
+        ln -sf /usr/bin/lld-link-9 /usr/local/bin/lld-link
+        ln -sf /usr/bin/llvm-mc-9 /usr/local/bin/llvm-mc
+    - name: Build
+      run: |
+        make
