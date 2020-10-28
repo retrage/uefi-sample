@@ -8,6 +8,37 @@
 #include "printf.h"
 #include "string.h"
 
+BOOLEAN
+CompareGuid (
+  IN EFI_GUID *Guid1,
+  IN EFI_GUID *Guid2
+  )
+{
+  UINTN Index;
+
+  if (Guid1 == NULL || Guid2 == NULL) {
+    return FALSE;
+  }
+
+  if (Guid1->Data1 != Guid2->Data1) {
+    return FALSE;
+  }
+  if (Guid1->Data2 != Guid2->Data2) {
+    return FALSE;
+  }
+  if (Guid1->Data3 != Guid2->Data3) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < 8; Index++) {
+    if (Guid1->Data4[Index] != Guid2->Data4[Index]) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
 CHAR16
 GetChar (
   VOID
