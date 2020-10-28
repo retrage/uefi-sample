@@ -5,6 +5,12 @@
 
 #include <Uefi.h>
 
+BOOLEAN
+CompareGuid (
+  IN EFI_GUID *Guid1,
+  IN EFI_GUID *Guid2
+  );
+
 CHAR16
 GetChar (
   VOID
