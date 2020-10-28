@@ -27,7 +27,7 @@ AllocateZeroPool (
     return NULL;
   }
 
-  gBS->SetMem (Buffer, Size, 0);
+  ZeroMem (Buffer, Size);
 
   return Buffer;
 }
@@ -61,6 +61,18 @@ CompareGuid (
   }
 
   return TRUE;
+}
+
+VOID
+ZeroMem (
+  IN VOID   *Buffer,
+  IN UINTN  Size
+  )
+{
+  if (Buffer == NULL || Size == 0) {
+    return;
+  }
+  gBS->SetMem (Buffer, Size, 0);
 }
 
 CHAR16
