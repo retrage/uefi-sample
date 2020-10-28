@@ -16,6 +16,12 @@ CompareGuid (
   IN EFI_GUID *Guid2
   );
 
+VOID
+ZeroMem (
+  IN OUT VOID   *Buffer,
+  IN     UINTN  Size
+  );
+
 CHAR16
 GetChar (
   VOID
