@@ -8,6 +8,30 @@
 #include "printf.h"
 #include "string.h"
 
+VOID *
+AllocateZeroPool (
+  IN UINTN  Size
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *Buffer;
+
+  Buffer = NULL;
+
+  Status = gBS->AllocatePool (
+      EfiLoaderData,
+      Size,
+      &Buffer
+      );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  gBS->SetMem (Buffer, Size, 0);
+
+  return Buffer;
+}
+
 BOOLEAN
 CompareGuid (
   IN EFI_GUID *Guid1,
