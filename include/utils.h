@@ -5,6 +5,11 @@
 
 #include <Uefi.h>
 
+VOID *
+AllocateZeroPool (
+  IN UINTN  Size
+  );
+
 BOOLEAN
 CompareGuid (
   IN EFI_GUID *Guid1,
