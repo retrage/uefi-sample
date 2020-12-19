@@ -3,9 +3,8 @@
 #include <Uefi.h>
 #include <GlobalTable.h>
 
-EFI_STATUS
-EFIAPI
-EfiMain (
+VOID
+Init (
   IN EFI_HANDLE       ImageHandle,
   IN EFI_SYSTEM_TABLE *SystemTable
   )
@@ -13,6 +12,16 @@ EfiMain (
   gImageHandle = ImageHandle;
   gST = SystemTable;
   gBS = gST->BootServices;
+}
+
+EFI_STATUS
+EFIAPI
+EfiMain (
+  IN EFI_HANDLE       ImageHandle,
+  IN EFI_SYSTEM_TABLE *SystemTable
+  )
+{
+  Init (ImageHandle, SystemTable);
 
   return EFI_SUCCESS;
 }
