@@ -3,7 +3,10 @@
 #include "string.h"
 
 #include <Uefi.h>
-#include <GlobalTable.h>
+
+extern EFI_SYSTEM_TABLE *gST;
+extern EFI_BOOT_SERVICES *gBS;
+extern EFI_HANDLE *gImageHandle;
 
 UINTN
 StrnLen (

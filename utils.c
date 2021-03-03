@@ -3,10 +3,13 @@
 #include "utils.h"
 
 #include <Uefi.h>
-#include <GlobalTable.h>
 
 #include "printf.h"
 #include "string.h"
+
+extern EFI_SYSTEM_TABLE *gST;
+extern EFI_BOOT_SERVICES *gBS;
+extern EFI_HANDLE gImageHandle;
 
 VOID *
 AllocateZeroPool (
