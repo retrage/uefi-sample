@@ -4,16 +4,16 @@ on: push
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Setup
       run: |
         sudo apt update
-        sudo apt install llvm-9 clang-9 lld-9 make
-        sudo ln -sf /usr/bin/clang-9 /usr/local/bin/clang
-        sudo ln -sf /usr/bin/lld-link-9 /usr/local/bin/lld-link
-        sudo ln -sf /usr/bin/llvm-mc-9 /usr/local/bin/llvm-mc
+        sudo apt install llvm-11 clang-11 lld-11 make
+        sudo ln -sf /usr/bin/clang-11 /usr/local/bin/clang
+        sudo ln -sf /usr/bin/lld-link-11 /usr/local/bin/lld-link
+        sudo ln -sf /usr/bin/llvm-mc-11 /usr/local/bin/llvm-mc
     - name: Build
       run: |
         make
